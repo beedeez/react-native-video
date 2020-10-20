@@ -6,20 +6,18 @@ import {
 	NativeModules,
 	View,
 	ViewPropTypes,
-	Image,
 	Platform,
-	findNodeHandle
+	findNodeHandle,
 } from 'react-native';
 import TextTrackType from './TextTrackType';
 import FilterType from './FilterType';
-import Poster from './Poster';
 import VideoResizeMode from './VideoResizeMode.js';
 import { getMemoSourceObject } from './utils';
 
 const styles = StyleSheet.create({
 	base: {
-		overflow: 'hidden'
-	}
+		overflow: 'hidden',
+	},
 });
 
 export { TextTrackType, FilterType };
@@ -27,14 +25,6 @@ export { TextTrackType, FilterType };
 const getSourceObject = getMemoSourceObject();
 
 export default class Video extends Component {
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			showPoster: !!props.poster
-		};
-	}
-
 	setNativeProps(nativeProps) {
 		this._root.setNativeProps(nativeProps);
 	}
@@ -58,8 +48,8 @@ export default class Video extends Component {
 			this._root.setNativeProps({
 				seek: {
 					time,
-					tolerance
-				}
+					tolerance,
+				},
 			});
 		} else {
 			this._root.setNativeProps({ seek: time });
@@ -83,18 +73,12 @@ export default class Video extends Component {
 
 	restoreUserInterfaceForPictureInPictureStopCompleted = (restored) => {
 		this.setNativeProps({
-			restoreUserInterfaceForPIPStopCompletionHandler: restored
+			restoreUserInterfaceForPIPStopCompletionHandler: restored,
 		});
 	};
 
 	_assignRoot = (component) => {
 		this._root = component;
-	};
-
-	_hidePoster = () => {
-		if (this.state.showPoster) {
-			this.setState({ showPoster: false });
-		}
 	};
 
 	_onLoadStart = (event) => {
@@ -104,10 +88,6 @@ export default class Video extends Component {
 	};
 
 	_onLoad = (event) => {
-		// Need to hide poster here for windows as onReadyForDisplay is not implemented
-		if (Platform.OS === 'windows') {
-			this._hidePoster();
-		}
 		if (this.props.onLoad) {
 			this.props.onLoad(event.nativeEvent);
 		}
@@ -174,10 +154,6 @@ export default class Video extends Component {
 	};
 
 	_onReadyForDisplay = (event) => {
-		if (!this.props.audioOnly) {
-			this._hidePoster();
-		}
-
 		if (this.props.onReadyForDisplay) {
 			this.props.onReadyForDisplay(event.nativeEvent);
 		}
@@ -287,7 +263,7 @@ export default class Video extends Component {
 			onAudioBecomingNoisy: this._onAudioBecomingNoisy,
 			onPictureInPictureStatusChanged: this._onPictureInPictureStatusChanged,
 			onRestoreUserInterfaceForPictureInPictureStop: this
-				._onRestoreUserInterfaceForPictureInPictureStop
+				._onRestoreUserInterfaceForPictureInPictureStop,
 		};
 
 		return (
@@ -297,11 +273,6 @@ export default class Video extends Component {
 					{...nativeProps}
 					style={StyleSheet.absoluteFill}
 				/>
-				{this.state.showPoster && (
-					<Poster
-						posterResizeMode={this.props.posterResizeMode}
-						poster={this.props.poster}></Poster>
-				)}
 			</View>
 		);
 	}
@@ -324,7 +295,7 @@ Video.propTypes = {
 		FilterType.PROCESS,
 		FilterType.TONAL,
 		FilterType.TRANSFER,
-		FilterType.SEPIA
+		FilterType.SEPIA,
 	]),
 	filterEnabled: PropTypes.bool,
 	/* Native only */
@@ -350,30 +321,28 @@ Video.propTypes = {
 	/* Wrapper component */
 	source: PropTypes.oneOfType([
 		PropTypes.shape({
-			uri: PropTypes.string
+			uri: PropTypes.string,
 		}),
 		// Opaque type returned by require('./video.mp4')
-		PropTypes.number
+		PropTypes.number,
 	]),
 	minLoadRetryCount: PropTypes.number,
 	maxBitRate: PropTypes.number,
 	resizeMode: PropTypes.string,
-	poster: PropTypes.string,
-	posterResizeMode: Image.propTypes.resizeMode,
 	repeat: PropTypes.bool,
 	automaticallyWaitsToMinimizeStalling: PropTypes.bool,
 	allowsExternalPlayback: PropTypes.bool,
 	selectedAudioTrack: PropTypes.shape({
 		type: PropTypes.string.isRequired,
-		value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+		value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 	}),
 	selectedVideoTrack: PropTypes.shape({
 		type: PropTypes.string.isRequired,
-		value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+		value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 	}),
 	selectedTextTrack: PropTypes.shape({
 		type: PropTypes.string.isRequired,
-		value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+		value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 	}),
 	textTracks: PropTypes.arrayOf(
 		PropTypes.shape({
@@ -382,9 +351,9 @@ Video.propTypes = {
 			type: PropTypes.oneOf([
 				TextTrackType.SRT,
 				TextTrackType.TTML,
-				TextTrackType.VTT
+				TextTrackType.VTT,
 			]),
-			language: PropTypes.string.isRequired
+			language: PropTypes.string.isRequired,
 		})
 	),
 	paused: PropTypes.bool,
@@ -394,7 +363,7 @@ Video.propTypes = {
 		minBufferMs: PropTypes.number,
 		maxBufferMs: PropTypes.number,
 		bufferForPlaybackMs: PropTypes.number,
-		bufferForPlaybackAfterRebufferMs: PropTypes.number
+		bufferForPlaybackAfterRebufferMs: PropTypes.number,
 	}),
 	stereoPan: PropTypes.number,
 	rate: PropTypes.number,
@@ -440,13 +409,13 @@ Video.propTypes = {
 	translateX: PropTypes.number,
 	translateY: PropTypes.number,
 	rotation: PropTypes.number,
-	...ViewPropTypes
+	...ViewPropTypes,
 };
 
 const RCTVideo = requireNativeComponent('RCTVideo', Video, {
 	nativeOnly: {
 		src: true,
 		seek: true,
-		fullscreen: true
-	}
+		fullscreen: true,
+	},
 });
