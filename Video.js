@@ -25,22 +25,6 @@ export { TextTrackType, FilterType };
 const getSourceObject = getMemoSourceObject();
 
 export default class Video extends Component {
-	setNativeProps(nativeProps) {
-		this._root.setNativeProps(nativeProps);
-	}
-
-	toTypeString(x) {
-		switch (typeof x) {
-			case 'object':
-				return x instanceof Date ? x.toISOString() : JSON.stringify(x); // object, null
-			case 'undefined':
-				return '';
-			default:
-				// boolean, number, string
-				return x.toString();
-		}
-	}
-
 	seek = (time, tolerance = 100) => {
 		if (isNaN(time)) throw new Error('Specified time is not a number');
 
@@ -56,25 +40,11 @@ export default class Video extends Component {
 		}
 	};
 
-	presentFullscreenPlayer = () => {
-		this.setNativeProps({ fullscreen: true });
-	};
-
-	dismissFullscreenPlayer = () => {
-		this.setNativeProps({ fullscreen: false });
-	};
-
-	save = async (options?) => {
+	save = async (options) => {
 		return await NativeModules.VideoManager.save(
 			options,
 			findNodeHandle(this._root)
 		);
-	};
-
-	restoreUserInterfaceForPictureInPictureStopCompleted = (restored) => {
-		this.setNativeProps({
-			restoreUserInterfaceForPIPStopCompletionHandler: restored,
-		});
 	};
 
 	_assignRoot = (component) => {
